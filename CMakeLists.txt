@@ -4,7 +4,7 @@
 cmake_minimum_required(VERSION 3.2)
 
 #Set project name, set PROJECT_VERSION_MINOR value equal to TRAVIS_BUILD NUMBER
-project(ip_filter_$ENV{TRAVIS_BUILD_NUMBER} VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
+project(ip_filter VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
 
 set (BOOST_MIN_VERSION "1.54.0")
 
@@ -12,7 +12,7 @@ set (BOOST_MIN_VERSION "1.54.0")
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
 #Process project_version_minor.h to set OTUS_HW_1_VERSION_MINOR value equal to PROJECT_VERSION_MINOR
-#configure_file(ip_filter_version.h.in ip_filter_version.h)
+configure_file(ip_filter_version.h.in ip_filter_version.h)
 
 #Set executable target
 add_executable(ip_filter main.cpp)
