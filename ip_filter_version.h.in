@@ -1,0 +1,30 @@
+// ip_filter_version.h in OTUS Homework #2
+// getVersion() function
+
+#pragma once
+
+// OTUS_HW_2_VERSION_... values are set by CMake while being built by Travis CI
+#define OTUS_HW_2_VERSION_MAJOR @PROJECT_VERSION_MAJOR@
+#define OTUS_HW_2_VERSION_MINOR @PROJECT_VERSION_MINOR@
+#define OTUS_HW_2_VERSION_PATCH @PROJECT_VERSION_PATCH@
+
+#ifndef OTUS_HW_2_VERSION_MAJOR
+  #define OTUS_HW_2_VERSION_MAJOR 0
+#endif
+
+#ifndef OTUS_HW_2_VERSION_MINOR
+  #define OTUS_HW_2_VERSION_MINOR 0
+#endif
+
+#ifndef OTUS_HW_2_VERSION_PATCH
+  #define OTUS_HW_2_VERSION_PATCH 0
+#endif
+
+
+
+void getVersion(int& versionMajor, int& versionMinor, int& versionPatch)
+{
+  versionMajor = OTUS_HW_2_VERSION_MAJOR;
+  versionMinor = OTUS_HW_2_VERSION_MINOR;
+  versionPatch = OTUS_HW_2_VERSION_PATCH;
+}
