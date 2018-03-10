@@ -73,13 +73,10 @@ ipArray ipIntegerToArray(const uint32_t& addressInteger)
 
   ipArray result{DEFAULT_IP_ARRAY};
   uint8_t d3{}, d2{}, d1{}, d0{};
-  d3 = addressInteger / std::pow(256, 3);                   // calculating the 4th digit in 256-imal representation
-  d2 = (addressInteger - d3 * std::pow(256, 3))
-       / std::pow(256, 2);                                  // calculating the 3rd digit in 256-imal representation
-  d1 = (addressInteger - d3 * std::pow(256, 3)
-        - d2 * std::pow(256, 2)) / 256;                     // calculating the 2nd digit in 256-imal representation
-  d0 = addressInteger - d3 * std::pow(256, 3)
-       - d2 * std::pow(256, 2) - d1 * 256;                  // calculating the 1st digit in 256-imal representation
+  d3 = addressInteger >> 24;                   // calculating the 4th digit in 256-imal representation
+  d2 = (addressInteger & 0x00FF0000) >> 16;    // calculating the 3rd digit in 256-imal representation
+  d1 = (addressInteger & 0x0000FF00) >> 8;     // calculating the 2nd digit in 256-imal representation
+  d0 = (addressInteger & 0x000000FF);          // calculating the 1st digit in 256-imal representation
   result[3] = d3;
   result[2] = d2;
   result[1] = d1;
