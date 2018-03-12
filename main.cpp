@@ -11,7 +11,7 @@
 #include "ip_address_works.h"
 
 using stringVector = std::vector<std::string>;
-using ipMultimap = std::multimap<uint32_t, ipArray, std::greater<uint32_t>>;
+using ipVector = std::vector<uint32_t>;
 
 stringVector split(std::string inputString, char delimiter)
 {
@@ -28,33 +28,35 @@ stringVector split(std::string inputString, char delimiter)
   return result;
 }
 
-ipMultimap filter(const ipMultimap& inputMap, int byte3, int byte2 = -1, int byte1 = -1, int byte0 = -1)
+ipVector filter(const ipVector& inputVector, int byte3, int byte2 = -1, int byte1 = -1, int byte0 = -1)
 {
-  ipMultimap result{};
-  for(auto addressPair : inputMap)
+  ipVector result{};
+  for(auto addressInteger : inputVector)
   {
-    if (byte3 == addressPair.second[3] &&
-        (byte2 == -1 || byte2 == addressPair.second[2]) &&
-        (byte1 == -1 || byte1 == addressPair.second[1]) &&
-        (byte0 == -1 || byte0 == addressPair.second[0])   )
-      result.insert(addressPair);
+    ipArray addressArray{ipIntegerToArray(addressInteger)};
+    if (byte3 == addressArray[3] &&
+        (byte2 == -1 || byte2 == addressArray[2]) &&
+        (byte1 == -1 || byte1 == addressArray[1]) &&
+        (byte0 == -1 || byte0 == addressArray[0])   )
+      result.push_back(addressInteger);
   }
   return result;
 }
 
 template <uint8_t... args>
-ipMultimap filterAny(const ipMultimap& inputMap)
+ipVector filterAny(const ipVector& inputVector)
 {
-  ipMultimap result{};
+  ipVector result{};
   std::array<uint8_t, sizeof...(args)> argsArray{args...};
-  for(auto addressPair : inputMap)
+  for(auto addressInteger : inputVector)
   {
+    ipArray addressArray{ipIntegerToArray(addressInteger)};
     for (auto& byte : argsArray)
     {
-      if (std::find(addressPair.second.begin(), addressPair.second.end(), byte)
-          != addressPair.second.end())
+      if (std::find(addressArray.begin(), addressArray.end(), byte)
+          != addressArray.end())
       {
-        result.insert(addressPair);
+        result.push_back(addressInteger);
         break;
       }
     }
@@ -67,7 +69,7 @@ stringVector test{"113.162.145.156", "157.39.22.224", "79.180.73.190", "179.210.
 
 int main(int argc, char* argv[])
 {
-  ipMultimap addresses{};
+  ipVector addresses{};
   try
   {
     std::string nextString;
@@ -82,8 +84,7 @@ int main(int argc, char* argv[])
     for (auto str : test)
     {
       auto addressInteger {ipStringToInteger(str)};
-      addresses.insert(std::make_pair<uint32_t, ipArray>(
-                         ipStringToInteger(str), ipIntegerToArray(addressInteger)));
+      addresses.push_back(addressInteger);
     }
 
     /* Output sorted values */
