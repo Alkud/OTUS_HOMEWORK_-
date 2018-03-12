@@ -11,7 +11,8 @@
 #include "ip_address_works.h"
 
 using stringVector = std::vector<std::string>;
-using ipMultimap = std::multimap<uint32_t, ipArray, std::greater<uint32_t>>;
+using ipPair = std::pair<uint32_t, ipArray>;
+using ipPairVector = std::vector<ipPair>;
 
 stringVector split(std::string inputString, char delimiter)
 {
@@ -28,33 +29,33 @@ stringVector split(std::string inputString, char delimiter)
   return result;
 }
 
-ipMultimap filter(const ipMultimap& inputMap, int byte3, int byte2 = -1, int byte1 = -1, int byte0 = -1)
+ipPairVector filter(const ipPairVector& inputVector, int byte3, int byte2 = -1, int byte1 = -1, int byte0 = -1)
 {
-  ipMultimap result{};
-  for(auto addressPair : inputMap)
+  ipPairVector result{};
+  for(auto addressPair : inputVector)
   {
     if (byte3 == addressPair.second[3] &&
         (byte2 == -1 || byte2 == addressPair.second[2]) &&
         (byte1 == -1 || byte1 == addressPair.second[1]) &&
         (byte0 == -1 || byte0 == addressPair.second[0])   )
-      result.insert(addressPair);
+      result.push_back(addressPair);
   }
   return result;
 }
 
 template <uint8_t... args>
-ipMultimap filterAny(const ipMultimap& inputMap)
+ipPairVector filterAny(const ipPairVector& inputVector)
 {
-  ipMultimap result{};
+  ipPairVector result{};
   std::array<uint8_t, sizeof...(args)> argsArray{args...};
-  for(auto addressPair : inputMap)
+  for(auto addressPair : inputVector)
   {
     for (auto& byte : argsArray)
     {
       if (std::find(addressPair.second.begin(), addressPair.second.end(), byte)
           != addressPair.second.end())
       {
-        result.insert(addressPair);
+        result.push_back(addressPair);
         break;
       }
     }
@@ -66,7 +67,7 @@ ipMultimap filterAny(const ipMultimap& inputMap)
 
 int main(int argc, char* argv[])
 {
-  ipMultimap addresses{};
+  ipPairVector addresses{};
   try
   {
     std::string nextString;
@@ -75,9 +76,11 @@ int main(int argc, char* argv[])
     {
       std::string addressString{split(nextString, '\t').at(0)};
       auto addressInteger {ipStringToInteger(addressString)};
-      addresses.insert(std::make_pair<uint32_t, ipArray>(
+      addresses.push_back(std::make_pair<uint32_t, ipArray>(
                          ipStringToInteger(addressString), ipIntegerToArray(addressInteger)));
     }
+    /* Sort in descending order */
+    std::sort(addresses.begin(), addresses.end(), std::greater<>());
     /* Output sorted values */
     for (auto addressPair : addresses)
     {
