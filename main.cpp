@@ -4,6 +4,7 @@
 #include <iterator>
 #include <string>
 #include <map>
+#include <set>
 #include <functional>
 #include <utility>
 #include <algorithm>
@@ -35,6 +36,7 @@ bool operator>(const ipStruct& a, const ipStruct& b)
 
 using ipStructVector = std::vector<ipStruct>;
 using ipStructList = std::list<ipStruct>;
+using ipStructMultiset = std::multiset<ipStruct, std::greater<>>;
 
 stringVector split(std::string inputString, char delimiter)
 {
@@ -62,7 +64,7 @@ T filter(const T& inputVector, int byte3, int byte2 = -1, int byte1 = -1, int by
         (byte2 == -1 || byte2 == addressStruct.byte2) &&
         (byte1 == -1 || byte1 == addressStruct.byte1) &&
         (byte0 == -1 || byte0 == addressStruct.byte0)   )
-      result.push_back(addressStruct);
+      result.insert(addressStruct);
   }
   return result;
 }
@@ -81,7 +83,7 @@ T filterAny(const T& inputVector)
           byte == addressStruct.byte1 ||
           byte == addressStruct.byte0   )
       {
-        result.push_back(addressStruct);
+        result.insert(addressStruct);
         break;
       }
     }
@@ -91,7 +93,7 @@ T filterAny(const T& inputVector)
 
 int main(int argc, char* argv[])
 {
-  ipStructList addresses{};
+  ipStructMultiset addresses{};
   try
   {
     std::string nextString;
@@ -103,16 +105,16 @@ int main(int argc, char* argv[])
       int byte3{}, byte2{}, byte1{}, byte0{};
       char ch{};
       stringStream >> byte3 >> ch >> byte2 >> ch >> byte1 >> ch >> byte0;
-      ipArray addressArray {static_cast<int>(byte0) ,static_cast<int>(byte1),
-            static_cast<int>(byte2), static_cast<int>(byte3)};
+      ipArray addressArray {static_cast<uint8_t>(byte0) ,static_cast<uint8_t>(byte1),
+            static_cast<uint8_t>(byte2), static_cast<uint8_t>(byte3)};
       auto addressInteger {ipArrayToInteger(addressArray)};
       ipStruct addressStruct{addressInteger, addressArray[3],
             addressArray[2], addressArray[1], addressArray[0]};
-      addresses.push_back(addressStruct);
+      addresses.insert(addressStruct);
     }
 
     //std::sort(addresses.begin(), addresses.end(), std::greater<>());
-    addresses.sort(std::greater<>());
+    //addresses.sort(std::greater<>());
 
     /* Output sorted values */
     for (auto addressStruct : addresses)
