@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <vector>
 #include <list>
+#include <sstream>
 #include "ip_address_works.h"
 
 using stringVector = std::vector<std::string>;
@@ -98,8 +99,13 @@ int main(int argc, char* argv[])
     while(std::getline(std::cin, nextString))
     {
       std::string addressString{split(nextString, '\t').at(0)};
-      auto addressInteger {ipStringToInteger(addressString)};
-      ipArray addressArray {ipIntegerToArray(addressInteger)};
+      std::stringstream stringStream{addressString};
+      int byte3{}, byte2{}, byte1{}, byte0{};
+      char ch{};
+      stringStream >> byte3 >> ch >> byte2 >> ch >> byte1 >> ch >> byte0;
+      ipArray addressArray {static_cast<int>(byte0) ,static_cast<int>(byte1),
+            static_cast<int>(byte2), static_cast<int>(byte3)};
+      auto addressInteger {ipArrayToInteger(addressArray)};
       ipStruct addressStruct{addressInteger, addressArray[3],
             addressArray[2], addressArray[1], addressArray[0]};
       addresses.push_back(addressStruct);
