@@ -1,15 +1,21 @@
 // main.cpp in OTUS Homework #2
 
 #include <iostream>
-#include <regex>
 #include <iterator>
+#include <string>
+#include <map>
+#include <functional>
+#include <utility>
+#include <algorithm>
+#include <vector>
 #include "ip_address_works.h"
 
-using ipIntVector = std::vector<uint32_t>;
+using stringVector = std::vector<std::string>;
+using ipMultimap = std::multimap<uint32_t, ipArray, std::greater<uint32_t>>;
 
-std::vector<std::string> split(std::string inputString, char delimiter)
+stringVector split(std::string inputString, char delimiter)
 {
-  std::vector<std::string> result;
+  stringVector result;
   auto first {0U};
   auto last{inputString.find_first_of(delimiter, 0)};
   while(last != std::string::npos)
@@ -22,49 +28,45 @@ std::vector<std::string> split(std::string inputString, char delimiter)
   return result;
 }
 
-ipIntVector filter(const ipIntVector& inputVector, uint8_t firstByte)
+ipMultimap filter(const ipMultimap& inputMap, int byte3, int byte2 = -1, int byte1 = -1, int byte0 = -1)
 {
-  std::vector<uint32_t> result;
-  for (auto address : inputVector)
+  ipMultimap result{};
+  for(auto addressPair : inputMap)
   {
-    if (address >> 24 == firstByte)
-      result.push_back(address);
+    if (byte3 == addressPair.second[3] &&
+        (byte2 == -1 || byte2 == addressPair.second[2]) &&
+        (byte1 == -1 || byte1 == addressPair.second[1]) &&
+        (byte0 == -1 || byte0 == addressPair.second[0])   )
+      result.insert(addressPair);
   }
   return result;
 }
 
-ipIntVector filter(const ipIntVector& inputVector, uint8_t firstByte, uint8_t secondByte)
+template <uint8_t... args>
+ipMultimap filterAny(const ipMultimap& inputMap)
 {
-  ipIntVector result;
-  for (auto address : inputVector)
+  ipMultimap result{};
+  std::array<uint8_t, sizeof...(args)> argsArray{args...};
+  for(auto addressPair : inputMap)
   {
-    if ( address >> 24 == firstByte &&
-        (address & 0x00FF0000) >> 16 == secondByte)
-      result.push_back(address);
+    for (auto& byte : argsArray)
+    {
+      if (std::find(addressPair.second.begin(), addressPair.second.end(), byte)
+          != addressPair.second.end())
+      {
+        result.insert(addressPair);
+        break;
+      }
+    }
   }
   return result;
 }
-
-ipIntVector filterAny(const ipIntVector& inputVector, uint8_t filterByte)
-{
-  ipIntVector result;
-  for (auto address : inputVector)
-  {
-    if (                     address >> 24 == filterByte ||
-              (address & 0x00FF0000) >> 16 == filterByte ||
-              (address & 0x0000FF00) >> 8  == filterByte ||
-              (address & 0x000000FF)       == filterByte   )
-      result.push_back(address);
-  }
-  return result;
-}
-
 
 
 
 int main(int argc, char* argv[])
 {
-  std::vector<uint32_t> addresses{};
+  ipMultimap addresses{};
   try
   {
     std::string nextString;
@@ -72,34 +74,47 @@ int main(int argc, char* argv[])
     while(std::getline(std::cin, nextString))
     {
       std::string addressString{split(nextString, '\t').at(0)};
-      addresses.push_back(ipStringToInteger(addressString));
+      auto addressInteger {ipStringToInteger(addressString)};
+      addresses.insert(std::make_pair<uint32_t, ipArray>(
+                         ipStringToInteger(addressString), ipIntegerToArray(addressInteger)));
     }
-    /* Lambda sorter */
-    auto descendingSorter {[](uint32_t a, uint32_t b){return b < a;}};
-    /* Sorting user input with lamba sorter */
-    std::sort(addresses.begin(), addresses.end(), descendingSorter); // sort in the descending order
     /* Output sorted values */
-    for (auto addressInteger : addresses)
+    for (auto addressPair : addresses)
     {
-      std::cout << ipIntegerToString(addressInteger) << std::endl;            // output in sorting order
+      std::cout << int(addressPair.second[3]) << "." <<
+                   int(addressPair.second[2]) << "." <<
+                   int(addressPair.second[1]) << "." <<
+                   int(addressPair.second[0]) << std::endl;
     }
 
+    /* Filter 1.*.*.*. */
     auto filteredAddresses {filter(addresses, 1)};
-    for (auto addressInteger : filteredAddresses)
+    for (auto addressPair : filteredAddresses)
     {
-      std::cout << ipIntegerToString(addressInteger) << std::endl;            // output in sorting order
+      std::cout << int(addressPair.second[3]) << "." <<
+                   int(addressPair.second[2]) << "." <<
+                   int(addressPair.second[1]) << "." <<
+                   int(addressPair.second[0]) << std::endl;
     }
 
+    /* Filter 46.70.*.* */
     filteredAddresses = filter(addresses, 46, 70);
-    for (auto addressInteger : filteredAddresses)
+    for (auto addressPair : filteredAddresses)
     {
-      std::cout << ipIntegerToString(addressInteger) << std::endl;            // output in sorting order
+      std::cout << int(addressPair.second[3]) << "." <<
+                   int(addressPair.second[2]) << "." <<
+                   int(addressPair.second[1]) << "." <<
+                   int(addressPair.second[0]) << std::endl;
     }
 
-    filteredAddresses = filterAny(addresses, 46);
-    for (auto addressInteger : filteredAddresses)
+    /* Filter any 46 */
+    filteredAddresses = filterAny<46>(addresses);
+    for (auto addressPair : filteredAddresses)
     {
-      std::cout << ipIntegerToString(addressInteger) << std::endl;            // output in sorting order
+      std::cout << int(addressPair.second[3]) << "." <<
+                   int(addressPair.second[2]) << "." <<
+                   int(addressPair.second[1]) << "." <<
+                   int(addressPair.second[0]) << std::endl;
     }
   }
   catch (const std::exception &e)
