@@ -84,40 +84,40 @@ int main(int argc, char* argv[])
     /* Output sorted values */
     for (auto addressPair : addresses)
     {
-      std::cout << int(addressPair.second[3]) << "." <<
+      /*std::cout << int(addressPair.second[3]) << "." <<
                    int(addressPair.second[2]) << "." <<
                    int(addressPair.second[1]) << "." <<
-                   int(addressPair.second[0]) << std::endl;
+                   int(addressPair.second[0]) << std::endl;*/
     }
 
     /* Filter 1.*.*.*. */
     auto filteredAddresses {filter(addresses, 1)};
     for (auto addressPair : filteredAddresses)
     {
-      std::cout << int(addressPair.second[3]) << "." <<
+      /*std::cout << int(addressPair.second[3]) << "." <<
                    int(addressPair.second[2]) << "." <<
                    int(addressPair.second[1]) << "." <<
-                   int(addressPair.second[0]) << std::endl;
+                   int(addressPair.second[0]) << std::endl;*/
     }
 
     /* Filter 46.70.*.* */
     filteredAddresses = filter(addresses, 46, 70);
     for (auto addressPair : filteredAddresses)
     {
-      std::cout << int(addressPair.second[3]) << "." <<
+      /*std::cout << int(addressPair.second[3]) << "." <<
                    int(addressPair.second[2]) << "." <<
                    int(addressPair.second[1]) << "." <<
-                   int(addressPair.second[0]) << std::endl;
+                   int(addressPair.second[0]) << std::endl;*/
     }
 
     /* Filter any 46 */
     filteredAddresses = filterAny<46>(addresses);
     for (auto addressPair : filteredAddresses)
     {
-      std::cout << int(addressPair.second[3]) << "." <<
+      /*std::cout << int(addressPair.second[3]) << "." <<
                    int(addressPair.second[2]) << "." <<
                    int(addressPair.second[1]) << "." <<
-                   int(addressPair.second[0]) << std::endl;
+                   int(addressPair.second[0]) << std::endl;*/
     }
   }
   catch (const std::exception &e)
