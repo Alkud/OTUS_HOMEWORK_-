@@ -8,6 +8,7 @@
 #include <utility>
 #include <algorithm>
 #include <vector>
+#include <list>
 #include "ip_address_works.h"
 
 using stringVector = std::vector<std::string>;
@@ -32,6 +33,7 @@ bool operator>(const ipStruct& a, const ipStruct& b)
 }
 
 using ipStructVector = std::vector<ipStruct>;
+using ipStructList = std::list<ipStruct>;
 
 stringVector split(std::string inputString, char delimiter)
 {
@@ -48,9 +50,11 @@ stringVector split(std::string inputString, char delimiter)
   return result;
 }
 
-ipStructVector filter(const ipStructVector& inputVector, int byte3, int byte2 = -1, int byte1 = -1, int byte0 = -1)
+template<class T>
+T filter(const T& inputVector, int byte3, int byte2 = -1, int byte1 = -1, int byte0 = -1)
 {
-  ipStructVector result{};
+  T result{};
+
   for(auto addressStruct : inputVector)
   {
     if (byte3 == addressStruct.byte3 &&
@@ -62,10 +66,10 @@ ipStructVector filter(const ipStructVector& inputVector, int byte3, int byte2 = 
   return result;
 }
 
-template <uint8_t... args>
-ipStructVector filterAny(const ipStructVector& inputVector)
+template <uint8_t... args, class T>
+T filterAny(const T& inputVector)
 {
-  ipStructVector result{};
+  T result{};
   std::array<uint8_t, sizeof...(args)> argsArray{args...};
   for(auto addressStruct : inputVector)
   {
@@ -86,7 +90,7 @@ ipStructVector filterAny(const ipStructVector& inputVector)
 
 int main(int argc, char* argv[])
 {
-  ipStructVector addresses{};
+  ipStructList addresses{};
   try
   {
     std::string nextString;
@@ -101,7 +105,8 @@ int main(int argc, char* argv[])
       addresses.push_back(addressStruct);
     }
 
-    std::sort(addresses.begin(), addresses.end(), std::greater<>());
+    //std::sort(addresses.begin(), addresses.end(), std::greater<>());
+    addresses.sort(std::greater<>());
 
     /* Output sorted values */
     for (auto addressStruct : addresses)
