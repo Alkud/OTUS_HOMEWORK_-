@@ -19,7 +19,7 @@ using ipTupleVector = std::vector<ipTuple>;
 uint32_t ipBytesToInteger(const uint8_t& d3, const uint8_t& d2,
                           const uint8_t& d1, const uint8_t& d0)
 {
-  return (d3 >> 24) + (d2 >> 16) + (d1 >> 8) + d0;
+  return (d3 << 24) + (d2 << 16) + (d1 << 8) + d0;
 }
 
 bool operator > (const ipTuple& a, const ipTuple& b)
@@ -101,8 +101,8 @@ int main(int argc, char* argv[])
       int byte3{}, byte2{}, byte1{}, byte0{};
       char ch{};
       stringStream >> byte3 >> ch >> byte2 >> ch >> byte1 >> ch >> byte0;
-      uint32_t addressInteger {ipBytesToInteger( (uint8_t)byte0, (uint8_t)byte1,
-            (uint8_t)byte2, (uint8_t)byte3)};
+      uint32_t addressInteger { ipBytesToInteger( (uint8_t)byte3, (uint8_t)byte2,
+            (uint8_t)byte1, (uint8_t)byte0 ) };
       addresses.push_back(std::tie(addressInteger, byte3, byte2, byte1, byte0));
     }
 
