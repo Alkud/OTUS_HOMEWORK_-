@@ -13,24 +13,8 @@
 
 using stringVector = std::vector<std::string>;
 
-using ipTuple = std::tuple<std::uint32_t, uint8_t, uint8_t, uint8_t, uint8_t>;
+using ipTuple = std::tuple<uint8_t, uint8_t, uint8_t, uint8_t>;
 using ipTupleVector = std::vector<ipTuple>;
-
-uint32_t ipBytesToInteger(const uint8_t& d3, const uint8_t& d2,
-                          const uint8_t& d1, const uint8_t& d0)
-{
-  return (d3 << 24) + (d2 << 16) + (d1 << 8) + d0;
-}
-
-bool operator > (const ipTuple& a, const ipTuple& b)
-{
-  return std::get<0>(a) > std::get<0>(b);
-}
-
-bool operator < (const ipTuple& a, const ipTuple& b)
-{
-  return std::get<0>(a) < std::get<0>(b);
-}
 
 stringVector split(std::string inputString, char delimiter)
 {
@@ -51,16 +35,16 @@ void filter(const ipTupleVector& inputVector, int byte3, int byte2 = -1, int byt
 {
   for(auto addressTuple : inputVector)
   {
-    int d3 {std::get<1>(addressTuple)};
-    int d2 {std::get<2>(addressTuple)};
-    int d1 {std::get<3>(addressTuple)};
-    int d0 {std::get<4>(addressTuple)};
-    if ( byte3 ==  d3 &&
-        (byte2 == -1 || byte2 == d2) &&
-        (byte1 == -1 || byte1 == d1) &&
-        (byte0 == -1 || byte0 == d0)   )
+    int b0 {std::get<3>(addressTuple)};
+    int b1 {std::get<2>(addressTuple)};
+    int b2 {std::get<1>(addressTuple)};
+    int b3 {std::get<0>(addressTuple)};
+    if ( byte3 ==  b3 &&
+        (byte2 == -1 || byte2 == b2) &&
+        (byte1 == -1 || byte1 == b1) &&
+        (byte0 == -1 || byte0 == b0)   )
     {
-      std::cout << d3 << '.' << d2 << '.' << d1 << '.' << d0 << std::endl;
+      std::cout << b3 << '.' << b2 << '.' << b1 << '.' << b0 << std::endl;
     }
   }
 }
@@ -71,16 +55,16 @@ void filterAny(const ipTupleVector& inputVector)
   std::array<uint8_t, sizeof...(args)> argsArray{args...};
   for(auto addressTuple : inputVector)
   {
-    int d3 {std::get<1>(addressTuple)};
-    int d2 {std::get<2>(addressTuple)};
-    int d1 {std::get<3>(addressTuple)};
-    int d0 {std::get<4>(addressTuple)};
+    int b0 {std::get<3>(addressTuple)};
+    int b1 {std::get<2>(addressTuple)};
+    int b2 {std::get<1>(addressTuple)};
+    int b3 {std::get<0>(addressTuple)};
     for (auto& byte : argsArray)
     {
-      if (byte == d3 || byte == d2 ||
-          byte == d1 || byte == d0   )
+      if (byte == b0 || byte == b1 ||
+          byte == b2 || byte == b3   )
       {
-        std::cout << d3 << '.' << d2 << '.' << d1 << '.' << d0 << std::endl;
+        std::cout << b3 << '.' << b2 << '.' << b1 << '.' << b0 << std::endl;
         break;
       }
     }
@@ -101,9 +85,8 @@ int main(int argc, char* argv[])
       int byte3{}, byte2{}, byte1{}, byte0{};
       char ch{};
       stringStream >> byte3 >> ch >> byte2 >> ch >> byte1 >> ch >> byte0;
-      uint32_t addressInteger { ipBytesToInteger( (uint8_t)byte3, (uint8_t)byte2,
-            (uint8_t)byte1, (uint8_t)byte0 ) };
-      addresses.push_back(std::tie(addressInteger, byte3, byte2, byte1, byte0));
+      addresses.push_back(std::tie(byte3, byte2, byte1, byte0));
+      //std::cout << byte3 << ':' << byte2 << ':' << byte1 << ':' << byte0  << " - " << addressString<< std::endl;
     }
 
     /* Descending sorting */
@@ -112,11 +95,11 @@ int main(int argc, char* argv[])
     /* Output sorted values */
     for (auto addressTuple : addresses)
     {
-      int d3 {std::get<1>(addressTuple)};
-      int d2 {std::get<2>(addressTuple)};
-      int d1 {std::get<3>(addressTuple)};
-      int d0 {std::get<4>(addressTuple)};
-      std::cout << d3 << '.' << d2 << '.' << d1 << '.' << d0 << std::endl;
+      int b0 {std::get<3>(addressTuple)};
+      int b1 {std::get<2>(addressTuple)};
+      int b2 {std::get<1>(addressTuple)};
+      int b3 {std::get<0>(addressTuple)};
+      std::cout << b3 << '.' << b2 << '.' << b1 << '.' << b0 << std::endl;
     }
 
     /* Filter 1.*.*.*. */
